@@ -1,0 +1,90 @@
+[
+    {
+        "id": "act-001",
+        "timestamp": "2026-02-11T11:25:14Z",
+        "agent": "Cost Intelligence Agent",
+        "action": "Clean Sheet Analysis Completed",
+        "component": "Toothbrush Handle - Nylon 6",
+        "componentId": "COMP-001",
+        "status": "success",
+        "details": "Should-cost updated from $38.1M to $38.4M (+0.8%)",
+        "priority": "high"
+    },
+    {
+        "id": "act-002",
+        "timestamp": "2026-02-11T11:18:42Z",
+        "agent": "Market Intel Agent",
+        "action": "Commodity Price Alert",
+        "component": "Nylon 6",
+        "componentId": null,
+        "status": "alert",
+        "details": "Price increased 3.2% week-over-week. Recommend renegotiation.",
+        "priority": "high"
+    },
+    {
+        "id": "act-003",
+        "timestamp": "2026-02-11T11:12:05Z",
+        "agent": "Negotiation Agent",
+        "action": "Supplier Meeting Scheduled",
+        "component": "Electric Toothbrush Motor Assembly",
+        "componentId": "COMP-003",
+        "status": "in-progress",
+        "details": "Meeting with MicroMotion Tech on 2026-02-15 at 10:00 AM EST",
+        "priority": "medium"
+    },
+    {
+        "id": "act-004",
+        "timestamp": "2026-02-11T11:05:33Z",
+        "agent": "Cost Intelligence Agent",
+        "action": "Should-Cost Model Updated",
+        "component": "Toothbrush Bristles - Nylon 612",
+        "componentId": "COMP-004",
+        "status": "success",
+        "details": "New labor rates and commodity prices incorporated. Variance now 30.8%.",
+        "priority": "critical"
+    },
+    {
+        "id": "act-005",
+        "timestamp": "2026-02-11T10:58:19Z",
+        "agent": "Savings Tracker Agent",
+        "action": "Negotiation Closed",
+        "component": "Mouthwash Bottle - PET",
+        "componentId": "COMP-005",
+        "status": "success",
+        "details": "Achieved $1.2M annual savings (6.1% reduction) with BottleTech.",
+        "priority": "high"
+    },
+    {
+        "id": "act-006",
+        "timestamp": "2026-02-11T10:45:11Z",
+        "agent": "Market Intel Agent",
+        "action": "Alternative Supplier Identified",
+        "component": "Toothpaste Cap - HDPE",
+        "componentId": "COMP-007",
+        "status": "pending",
+        "details": "GlobalCap Ltd offers 18% cost reduction. Risk assessment in progress.",
+        "priority": "medium"
+    },
+    {
+        "id": "act-007",
+        "timestamp": "2026-02-11T10:32:47Z",
+        "agent": "Negotiation Agent",
+        "action": "Fact Pack Generated",
+        "component": "Toothbrush Handle - Nylon 6",
+        "componentId": "COMP-001",
+        "status": "success",
+        "details": "32-page detailed analysis ready for PlastiFlex negotiation.",
+        "priority": "high"
+    },
+    {
+        "id": "act-008",
+        "timestamp": "2026-02-11T10:21:05Z",
+        "agent": "Cost Intelligence Agent",
+        "action": "Scenario Analysis Completed",
+        "component": "Battery Pack - Li-Ion",
+        "componentId": "COMP-009",
+        "status": "success",
+        "details": "Modeled 5 scenarios. Best case: $2.1M savings with cobalt substitution.",
+        "priority": "medium"
+    }
+]
