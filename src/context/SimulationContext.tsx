@@ -3,13 +3,15 @@ import { type LucideIcon } from 'lucide-react';
 import { type SyncStage, dataSources, type DataSource } from '../data/dataSources';
 
 /** Should-Cost Types */
-export type PipelineStage = 'idle' | 'bom' | 'materials' | 'conversion' | 'overhead' | 'logistics' | 'margin' | 'complete';
+export type PipelineStage = 'idle' | 'bom' | 'materials' | 'conversion' | 'overhead' | 'logistics' | 'tariffs' | 'margin' | 'complete';
 
 export interface CalculationResult {
     materialsCost: number;
     conversionCost: number;
     overheadCost: number;
     logisticsCost: number;
+    tariffCost: number;
+    fxAdjustment: number;
     marginCost: number;
     totalShouldCost: number;
     currentPrice: number;
@@ -18,6 +20,7 @@ export interface CalculationResult {
     confidence: number;
     bomBreakdown: Array<{ name: string; cost: number }>;
     phaseBreakdown: Array<{ name: string; cost: number; type: string }>;
+    tariffBreakdown: Array<{ name: string; supplier: string; region: string; dutyPct: number; cost: number; fxPct: number; fxImpact: number }>;
 }
 
 /** Data-Sync Types */
@@ -43,6 +46,8 @@ interface SimulationContextType {
     scPipelineCosts: Record<string, number>;
     runShouldCostSimulation: (
         product: any,
+        bomItem: any,
+        component: any,
         choices: Record<string, string>,
         overheads: number,
         margins: number,
@@ -86,7 +91,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
 
 
     // ── Run Should-Cost Simulation ──
-    const runShouldCostSimulation = useCallback((product: any, choices: any, overheadPct: number, marginPct: number, laborRegion: string, toggles: any) => {
+    const runShouldCostSimulation = useCallback((product: any, bomItem: any, component: any, choices: any, overheadPct: number, marginPct: number, laborRegion: string, toggles: any) => {
         if (scIsCalculating) return; // Prevent double run
         setScIsCalculating(true);
         setScResult(null);
@@ -94,19 +99,42 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         setScPipelineStage('idle');
 
         // 1. Calculate final results synchronously first to have them ready
-        // (Copied logic from original ShouldCostSimulator calculate function)
-        const stages: PipelineStage[] = ['bom', 'materials', 'conversion', 'overhead', 'logistics', 'margin', 'complete'];
+        // (Calculation now works with a SINGLE BOM item instead of all items)
+        const stages: PipelineStage[] = ['bom', 'materials', 'conversion', 'overhead', 'logistics', 'tariffs', 'margin', 'complete'];
 
-        // ... (calculation logic) ...
+        // Calculate for single BOM item only
         const bomBreakdown: Array<{ name: string; cost: number }> = [];
+        const tariffBreakdown: Array<{ name: string; supplier: string; region: string; dutyPct: number; cost: number; fxPct: number; fxImpact: number }> = [];
         let materialsCost = 0;
-        product.bom.forEach((bom: any) => {
-            const chosenSupplierId = choices[bom.id] || bom.defaultSupplierId;
-            const supplier = bom.suppliers.find((s: any) => s.id === chosenSupplierId);
-            const cost = supplier ? supplier.pricePerUnit * bom.scrapFactor : 0;
-            materialsCost += cost;
-            bomBreakdown.push({ name: bom.name, cost: +cost.toFixed(4) });
-        });
+        let tariffCost = 0;
+        let fxAdjustment = 0;
+
+        if (bomItem) {
+            const chosenSupplierId = choices[bomItem.id] || bomItem.defaultSupplierId;
+            const supplier = bomItem.suppliers.find((s: any) => s.id === chosenSupplierId);
+            const cost = supplier ? supplier.pricePerUnit * bomItem.scrapFactor : 0;
+            materialsCost = cost;
+            bomBreakdown.push({ name: component?.primaryCommodity || bomItem.name, cost: +cost.toFixed(4) });
+
+            // Supplier-specific tariff & FX
+            if (supplier) {
+                const dutyPct = supplier.importDutyPct ?? 0;
+                const duty = +(cost * dutyPct / 100).toFixed(6);
+                tariffCost = duty;
+                const fxPct = supplier.fxMovementPct ?? 0;
+                const fxImp = +(cost * fxPct / 100).toFixed(6);
+                fxAdjustment = fxImp;
+                tariffBreakdown.push({
+                    name: component?.primaryCommodity || bomItem.name,
+                    supplier: supplier.name,
+                    region: supplier.region,
+                    dutyPct,
+                    cost: duty,
+                    fxPct,
+                    fxImpact: fxImp,
+                });
+            }
+        }
 
         const phaseBreakdown: Array<{ name: string; cost: number; type: string }> = [];
         let conversionCost = 0;
@@ -129,18 +157,20 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         const dutyAmount = subtotalBeforeLogistics * (logi.importDutyPct / 100);
         const logisticsCost = logi.domestic + logi.oceanFreight + dutyAmount + logi.brokerage + logi.destination;
 
-        const costBase = materialsCost + conversionCost + overheadCost + logisticsCost;
+        const costBase = materialsCost + conversionCost + overheadCost + logisticsCost + tariffCost;
         const marginCost = costBase * (marginPct / 100);
         const totalShouldCost = costBase + marginCost;
 
-        const savings = product.currentMarketPrice - totalShouldCost;
-        const savingsPercent = (savings / product.currentMarketPrice) * 100;
+        // Use component-level current cost instead of product-level market price
+        const currentPrice = component?.unitCurrentCost || 0;
+        const savings = currentPrice - totalShouldCost;
+        const savingsPercent = currentPrice > 0 ? (savings / currentPrice) * 100 : 0;
 
         const finalResult: CalculationResult = {
-            materialsCost, conversionCost, overheadCost, logisticsCost, marginCost,
-            totalShouldCost, currentPrice: product.currentMarketPrice,
+            materialsCost, conversionCost, overheadCost, logisticsCost, tariffCost, fxAdjustment, marginCost,
+            totalShouldCost, currentPrice,
             savings, savingsPercent, confidence: product.confidenceScore,
-            bomBreakdown, phaseBreakdown,
+            bomBreakdown, phaseBreakdown, tariffBreakdown,
         };
 
         // 2. Start Animation Interval
@@ -165,13 +195,14 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
             if (stage === 'conversion') runningCosts.conversion = conversionCost;
             if (stage === 'overhead') runningCosts.overhead = overheadCost;
             if (stage === 'logistics') runningCosts.logistics = logisticsCost;
+            if (stage === 'tariffs') runningCosts.tariffs = tariffCost;
             if (stage === 'margin') runningCosts.margin = marginCost;
 
             // We must update state functionally to avoid closure staleness if dependencies change
             setScPipelineCosts({ ...runningCosts }); // Create new object reference
 
             idx++;
-        }, 30000); // 30s delay as requested
+        }, 800); // ~1s per stage for smooth animation
 
     }, [scIsCalculating]);
 

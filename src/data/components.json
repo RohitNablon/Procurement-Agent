@@ -10,12 +10,14 @@
         "variancePercent": 17.7,
         "supplier": "PlastiFlex Industries",
         "lastNegotiation": "2025-11-15",
+        "contractSignedDate": "2025-11-15",
         "confidence": "High",
         "riskLevel": "Medium",
         "commodities": [
             "Nylon 6",
             "Titanium White"
         ],
+        "primaryCommodity": "Nylon 6",
         "monthlyTrend": [
             42.5,
             43.2,
@@ -24,7 +26,32 @@
             45.8,
             45.2
         ],
-        "agentStatus": "active"
+        "agentStatus": "active",
+        "bomItemId": "BOM-004",
+        "unitCurrentCost": 1.51,
+        "unitShouldCost": 1.28,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.78,
+                "shouldCost": 0.62
+            },
+            "conversion": {
+                "clientPays": 0.26,
+                "shouldCost": 0.24
+            },
+            "overhead": {
+                "clientPays": 0.22,
+                "shouldCost": 0.17
+            },
+            "logistics": {
+                "clientPays": 0.08,
+                "shouldCost": 0.07
+            },
+            "supplierMargin": {
+                "clientPays": 0.17,
+                "shouldCost": 0.18
+            }
+        }
     },
     {
         "id": "COMP-002",
@@ -37,12 +64,14 @@
         "variancePercent": 12.9,
         "supplier": "FlexiPack Solutions",
         "lastNegotiation": "2025-10-22",
+        "contractSignedDate": "2025-10-22",
         "confidence": "Medium",
         "riskLevel": "Low",
         "commodities": [
             "LDPE",
             "Aluminum Foil"
         ],
+        "primaryCommodity": "LDPE",
         "monthlyTrend": [
             36.8,
             37.5,
@@ -51,7 +80,32 @@
             38.9,
             38.5
         ],
-        "agentStatus": "monitoring"
+        "agentStatus": "monitoring",
+        "bomItemId": "BOM-T01",
+        "unitCurrentCost": 0.77,
+        "unitShouldCost": 0.68,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.32,
+                "shouldCost": 0.27
+            },
+            "conversion": {
+                "clientPays": 0.16,
+                "shouldCost": 0.15
+            },
+            "overhead": {
+                "clientPays": 0.13,
+                "shouldCost": 0.12
+            },
+            "logistics": {
+                "clientPays": 0.06,
+                "shouldCost": 0.05
+            },
+            "supplierMargin": {
+                "clientPays": 0.10,
+                "shouldCost": 0.09
+            }
+        }
     },
     {
         "id": "COMP-003",
@@ -64,6 +118,7 @@
         "variancePercent": 7.0,
         "supplier": "MicroMotion Tech",
         "lastNegotiation": "2025-12-01",
+        "contractSignedDate": "2025-12-01",
         "confidence": "High",
         "riskLevel": "Low",
         "commodities": [
@@ -71,6 +126,7 @@
             "Neodymium Magnets",
             "Steel Core"
         ],
+        "primaryCommodity": "Copper",
         "monthlyTrend": [
             51.2,
             51.8,
@@ -79,7 +135,32 @@
             52.1,
             52.3
         ],
-        "agentStatus": "active"
+        "agentStatus": "active",
+        "bomItemId": "BOM-002",
+        "unitCurrentCost": 2.61,
+        "unitShouldCost": 2.45,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 1.42,
+                "shouldCost": 1.31
+            },
+            "conversion": {
+                "clientPays": 0.57,
+                "shouldCost": 0.55
+            },
+            "overhead": {
+                "clientPays": 0.29,
+                "shouldCost": 0.28
+            },
+            "logistics": {
+                "clientPays": 0.11,
+                "shouldCost": 0.10
+            },
+            "supplierMargin": {
+                "clientPays": 0.22,
+                "shouldCost": 0.21
+            }
+        }
     },
     {
         "id": "COMP-004",
@@ -92,12 +173,14 @@
         "variancePercent": 30.8,
         "supplier": "BristleCraft Ltd",
         "lastNegotiation": "2025-09-14",
+        "contractSignedDate": "2025-09-14",
         "confidence": "Medium",
         "riskLevel": "High",
         "commodities": [
             "Nylon 612",
             "Carbon Black"
         ],
+        "primaryCommodity": "Nylon 6",
         "monthlyTrend": [
             27.5,
             28.0,
@@ -106,7 +189,32 @@
             29.2,
             28.9
         ],
-        "agentStatus": "escalated"
+        "agentStatus": "escalated",
+        "bomItemId": "BOM-001",
+        "unitCurrentCost": 0.96,
+        "unitShouldCost": 0.74,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.52,
+                "shouldCost": 0.38
+            },
+            "conversion": {
+                "clientPays": 0.18,
+                "shouldCost": 0.14
+            },
+            "overhead": {
+                "clientPays": 0.13,
+                "shouldCost": 0.10
+            },
+            "logistics": {
+                "clientPays": 0.05,
+                "shouldCost": 0.04
+            },
+            "supplierMargin": {
+                "clientPays": 0.08,
+                "shouldCost": 0.08
+            }
+        }
     },
     {
         "id": "COMP-005",
@@ -119,12 +227,14 @@
         "variancePercent": 14.5,
         "supplier": "BottleTech Industries",
         "lastNegotiation": "2025-11-28",
+        "contractSignedDate": "2025-11-28",
         "confidence": "High",
         "riskLevel": "Medium",
         "commodities": [
             "PET Resin",
             "Colorants"
         ],
+        "primaryCommodity": "PET Resin",
         "monthlyTrend": [
             19.2,
             19.5,
@@ -133,7 +243,32 @@
             19.9,
             19.8
         ],
-        "agentStatus": "monitoring"
+        "agentStatus": "monitoring",
+        "bomItemId": "BOM-M01",
+        "unitCurrentCost": 0.25,
+        "unitShouldCost": 0.22,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.09,
+                "shouldCost": 0.08
+            },
+            "conversion": {
+                "clientPays": 0.06,
+                "shouldCost": 0.05
+            },
+            "overhead": {
+                "clientPays": 0.04,
+                "shouldCost": 0.04
+            },
+            "logistics": {
+                "clientPays": 0.03,
+                "shouldCost": 0.02
+            },
+            "supplierMargin": {
+                "clientPays": 0.03,
+                "shouldCost": 0.03
+            }
+        }
     },
     {
         "id": "COMP-006",
@@ -146,12 +281,14 @@
         "variancePercent": 13.8,
         "supplier": "ContainerPro",
         "lastNegotiation": "2025-10-05",
+        "contractSignedDate": "2025-10-05",
         "confidence": "Medium",
         "riskLevel": "Low",
         "commodities": [
             "Polypropylene",
             "Steel Cutter"
         ],
+        "primaryCommodity": "Polypropylene",
         "monthlyTrend": [
             12.1,
             12.3,
@@ -160,7 +297,32 @@
             12.4,
             12.4
         ],
-        "agentStatus": "active"
+        "agentStatus": "active",
+        "bomItemId": "BOM-M02",
+        "unitCurrentCost": 0.31,
+        "unitShouldCost": 0.27,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.13,
+                "shouldCost": 0.11
+            },
+            "conversion": {
+                "clientPays": 0.07,
+                "shouldCost": 0.06
+            },
+            "overhead": {
+                "clientPays": 0.05,
+                "shouldCost": 0.04
+            },
+            "logistics": {
+                "clientPays": 0.03,
+                "shouldCost": 0.03
+            },
+            "supplierMargin": {
+                "clientPays": 0.03,
+                "shouldCost": 0.03
+            }
+        }
     },
     {
         "id": "COMP-007",
@@ -173,12 +335,14 @@
         "variancePercent": 21.1,
         "supplier": "CapMasters Inc",
         "lastNegotiation": "2025-08-19",
+        "contractSignedDate": "2025-08-19",
         "confidence": "Low",
         "riskLevel": "High",
         "commodities": [
             "HDPE",
             "Colorants"
         ],
+        "primaryCommodity": "Polypropylene",
         "monthlyTrend": [
             8.2,
             8.3,
@@ -187,7 +351,32 @@
             8.7,
             8.6
         ],
-        "agentStatus": "active"
+        "agentStatus": "active",
+        "bomItemId": "BOM-T03",
+        "unitCurrentCost": 0.17,
+        "unitShouldCost": 0.14,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.07,
+                "shouldCost": 0.05
+            },
+            "conversion": {
+                "clientPays": 0.04,
+                "shouldCost": 0.04
+            },
+            "overhead": {
+                "clientPays": 0.03,
+                "shouldCost": 0.02
+            },
+            "logistics": {
+                "clientPays": 0.01,
+                "shouldCost": 0.01
+            },
+            "supplierMargin": {
+                "clientPays": 0.02,
+                "shouldCost": 0.02
+            }
+        }
     },
     {
         "id": "COMP-008",
@@ -200,12 +389,14 @@
         "variancePercent": 9.5,
         "supplier": "AlumiFlex Packaging",
         "lastNegotiation": "2025-11-10",
+        "contractSignedDate": "2025-11-10",
         "confidence": "High",
         "riskLevel": "Low",
         "commodities": [
             "Aluminum Foil",
             "Adhesive"
         ],
+        "primaryCommodity": "Aluminum",
         "monthlyTrend": [
             15.8,
             16.0,
@@ -214,7 +405,32 @@
             16.3,
             16.2
         ],
-        "agentStatus": "monitoring"
+        "agentStatus": "monitoring",
+        "bomItemId": "BOM-T02",
+        "unitCurrentCost": 0.54,
+        "unitShouldCost": 0.49,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.24,
+                "shouldCost": 0.22
+            },
+            "conversion": {
+                "clientPays": 0.12,
+                "shouldCost": 0.11
+            },
+            "overhead": {
+                "clientPays": 0.08,
+                "shouldCost": 0.07
+            },
+            "logistics": {
+                "clientPays": 0.04,
+                "shouldCost": 0.03
+            },
+            "supplierMargin": {
+                "clientPays": 0.06,
+                "shouldCost": 0.06
+            }
+        }
     },
     {
         "id": "COMP-009",
@@ -227,6 +443,7 @@
         "variancePercent": 12.8,
         "supplier": "PowerCell Solutions",
         "lastNegotiation": "2025-12-05",
+        "contractSignedDate": "2025-12-05",
         "confidence": "Medium",
         "riskLevel": "Medium",
         "commodities": [
@@ -234,6 +451,7 @@
             "Cobalt",
             "Nickel"
         ],
+        "primaryCommodity": "Lithium",
         "monthlyTrend": [
             24.0,
             24.3,
@@ -242,7 +460,32 @@
             24.9,
             24.7
         ],
-        "agentStatus": "active"
+        "agentStatus": "active",
+        "bomItemId": "BOM-005",
+        "unitCurrentCost": 1.24,
+        "unitShouldCost": 1.10,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.60,
+                "shouldCost": 0.52
+            },
+            "conversion": {
+                "clientPays": 0.25,
+                "shouldCost": 0.23
+            },
+            "overhead": {
+                "clientPays": 0.18,
+                "shouldCost": 0.16
+            },
+            "logistics": {
+                "clientPays": 0.09,
+                "shouldCost": 0.08
+            },
+            "supplierMargin": {
+                "clientPays": 0.12,
+                "shouldCost": 0.11
+            }
+        }
     },
     {
         "id": "COMP-010",
@@ -255,12 +498,14 @@
         "variancePercent": 14.5,
         "supplier": "PackPro Graphics",
         "lastNegotiation": "2025-09-28",
+        "contractSignedDate": "2025-09-28",
         "confidence": "High",
         "riskLevel": "Low",
         "commodities": [
             "Recycled Cardboard",
             "Soy Ink"
         ],
+        "primaryCommodity": "Polypropylene",
         "monthlyTrend": [
             6.1,
             6.2,
@@ -269,6 +514,31 @@
             6.3,
             6.3
         ],
-        "agentStatus": "monitoring"
+        "agentStatus": "monitoring",
+        "bomItemId": "BOM-008",
+        "unitCurrentCost": 0.13,
+        "unitShouldCost": 0.11,
+        "costBreakdown": {
+            "rawMaterials": {
+                "clientPays": 0.05,
+                "shouldCost": 0.04
+            },
+            "conversion": {
+                "clientPays": 0.03,
+                "shouldCost": 0.03
+            },
+            "overhead": {
+                "clientPays": 0.02,
+                "shouldCost": 0.02
+            },
+            "logistics": {
+                "clientPays": 0.01,
+                "shouldCost": 0.01
+            },
+            "supplierMargin": {
+                "clientPays": 0.02,
+                "shouldCost": 0.01
+            }
+        }
     }
 ]

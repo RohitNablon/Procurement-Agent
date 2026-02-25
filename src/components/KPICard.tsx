@@ -11,9 +11,10 @@ export interface KPICardProps {
     color?: 'cyan' | 'purple' | 'green' | 'red' | 'yellow' | 'blue';
     className?: string;
     subtitle?: string;
+    onClick?: () => void;
 }
 
-export function KPICard({ title, value, change, changeLabel = 'vs last month', icon: Icon, color = 'cyan', className, subtitle }: KPICardProps) {
+export function KPICard({ title, value, change, changeLabel = 'vs last month', icon: Icon, color = 'cyan', className, subtitle, onClick }: KPICardProps) {
     const colorMap = {
         cyan: 'text-cyan-400 bg-cyan-400/10 border-cyan-400/20',
         purple: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
@@ -24,7 +25,7 @@ export function KPICard({ title, value, change, changeLabel = 'vs last month', i
     };
 
     return (
-        <div className={cn('bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-xl hover:border-white/20 transition-all duration-300 group', className)}>
+        <div onClick={onClick} className={cn('bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-xl hover:border-white/20 transition-all duration-300 group', onClick && 'cursor-pointer', className)}>
             <div className="flex justify-between items-start mb-4">
                 <div>
                     <h3 className="text-gray-400 text-sm font-medium">{title}</h3>

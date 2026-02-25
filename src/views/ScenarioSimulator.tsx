@@ -30,7 +30,7 @@ const ScenarioSimulator = () => {
         { name: 'Revised', value: impacts.total, fill: '#8b5cf6' },
     ];
 
-    const getIcon = (v: number) => v > 0.5 ? '🔴' : v > 0 ? '⚠️' : v < 0 ? '✓' : '—';
+    const getIcon = (v: number) => v > 0.5 ? '▲' : v > 0 ? '!' : v < 0 ? '✓' : '—';
 
     return (
         <div className="flex h-screen bg-[#09090b]">
@@ -38,7 +38,7 @@ const ScenarioSimulator = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header breadcrumbs={['Nablon Procurement Agent', 'Scenario Simulator']} />
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <h1 className="text-2xl font-bold text-white">🎲 Scenario Simulator — Li-ion Battery Pack</h1>
+                    <h1 className="text-2xl font-bold text-white">Scenario Simulator — Li-ion Battery Pack</h1>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Controls */}
@@ -90,7 +90,7 @@ const ScenarioSimulator = () => {
                         {/* Results */}
                         <div className="space-y-4">
                             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-                                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">📊 Impact Simulation Results</h3>
+                                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Impact Simulation Results</h3>
                                 <div className="space-y-3 text-sm font-mono">
                                     <div className="flex justify-between"><span className="text-gray-300">Baseline Should-Cost:</span><span className="text-white font-bold">${baseline.toFixed(2)}</span></div>
                                     <div className="flex justify-between"><span className="text-gray-300">+ Commodity volatility:</span><span className={impacts.commodity > 0 ? 'text-red-400' : 'text-green-400'}>+${impacts.commodity.toFixed(2)} {getIcon(impacts.commodity)}</span></div>
@@ -120,7 +120,7 @@ const ScenarioSimulator = () => {
 
                             {/* LLM Strategic Insight */}
                             <div className="bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-xl p-5">
-                                <h3 className="text-sm font-medium text-cyan-400 mb-3">💡 Strategic Insight (AI-Generated)</h3>
+                                <h3 className="text-sm font-medium text-cyan-400 mb-3">Strategic Insight (AI-Generated)</h3>
                                 <div className="text-sm text-gray-300 space-y-2">
                                     {impacts.total > 8.47 ? (
                                         <>

@@ -83,7 +83,7 @@ const ComponentDeepDive = () => {
                                     <p className="text-2xl font-bold text-cyan-400">${(component.shouldCost / 1_000_000).toFixed(1)}M<span className="text-sm text-gray-400">/yr</span></p>
                                 </div>
                                 <div className="pt-3 border-t border-white/10">
-                                    <p className="text-xs text-gray-500">💰 Variance / Opportunity</p>
+                                    <p className="text-xs text-gray-500">Variance / Opportunity</p>
                                     <p className={`text-2xl font-bold ${component.variancePercent > 10 ? 'text-green-400' : 'text-yellow-400'}`}>
                                         ${(component.variance / 1_000_000).toFixed(1)}M
                                         <span className="text-sm font-normal ml-2">({component.variancePercent}%)</span>
@@ -100,7 +100,7 @@ const ComponentDeepDive = () => {
                         {/* Metadata */}
                         <div className="space-y-4">
                             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-5">
-                                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">📍 Component Metadata</h3>
+                                <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Component Metadata</h3>
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                     <div><span className="text-gray-500">Supplier</span><p className="text-white font-medium">{component.supplier}</p></div>
                                     <div><span className="text-gray-500">Geography</span><p className="text-white font-medium">{component.location}</p></div>
@@ -121,7 +121,7 @@ const ComponentDeepDive = () => {
 
                         {/* Agent Activity */}
                         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-5">
-                            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">🤖 Agent Activity <span className="text-green-400 animate-pulse">● Live</span></h3>
+                            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Agent Activity <span className="text-green-400 animate-pulse">● Live</span></h3>
                             <div className="flex flex-col items-center justify-center h-[200px] text-gray-500 text-sm">
                                 <p>Analysis agents active for this component.</p>
                                 <div className="flex gap-2 mt-4">

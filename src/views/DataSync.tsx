@@ -185,7 +185,7 @@ const DataSync = () => {
                                                         {STAGE_LABELS[sync.stage]}
                                                     </span>
                                                     <span className="text-xs text-gray-500 ml-auto">
-                                                        {source.type === 'internal' ? '🔵 Internal' : '🟡 External'}
+                                                        {source.type === 'internal' ? 'Internal' : 'External'}
                                                     </span>
                                                 </div>
                                                 {/* Progress bar */}
