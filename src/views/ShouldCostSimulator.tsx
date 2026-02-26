@@ -130,14 +130,33 @@ const ShouldCostSimulator = () => {
         const f = supplierRmScaleFactor;
         const rmLeverage = activeSupplier.rmLeverageFactor ?? 1.0;
         const ohTargetScale = activeSupplier.overheadBenchmarkPct / 15;
+
+        // When simulation result exists, use its values for the shouldCost column
+        // so the breakdown table reflects the user's input choices (overhead %, margin %, labor region, phases)
+        const useSim = !!result;
         return {
-            rawMaterials: { clientPays: bd.rawMaterials.clientPays * f, shouldCost: bd.rawMaterials.shouldCost * rmLeverage },
-            conversion: { clientPays: bd.conversion.clientPays, shouldCost: bd.conversion.shouldCost },
-            overhead: { clientPays: bd.overhead.clientPays, shouldCost: bd.overhead.shouldCost * ohTargetScale },
-            logistics: { clientPays: bd.logistics.clientPays, shouldCost: bd.logistics.shouldCost },
-            supplierMargin: { clientPays: bd.supplierMargin.clientPays, shouldCost: bd.supplierMargin.shouldCost },
+            rawMaterials: {
+                clientPays: bd.rawMaterials.clientPays * f,
+                shouldCost: useSim ? result!.materialsCost : bd.rawMaterials.shouldCost * rmLeverage,
+            },
+            conversion: {
+                clientPays: bd.conversion.clientPays,
+                shouldCost: useSim ? result!.conversionCost : bd.conversion.shouldCost,
+            },
+            overhead: {
+                clientPays: bd.overhead.clientPays,
+                shouldCost: useSim ? result!.overheadCost : bd.overhead.shouldCost * ohTargetScale,
+            },
+            logistics: {
+                clientPays: bd.logistics.clientPays,
+                shouldCost: useSim ? result!.logisticsCost : bd.logistics.shouldCost,
+            },
+            supplierMargin: {
+                clientPays: bd.supplierMargin.clientPays,
+                shouldCost: useSim ? result!.marginCost : bd.supplierMargin.shouldCost,
+            },
         };
-    }, [selectedComponent, activeSupplier, supplierRmScaleFactor]);
+    }, [selectedComponent, activeSupplier, supplierRmScaleFactor, result]);
 
     // ── Unit-price waterfall data (McKinsey style — range-based, uses adjustedCostBreakdown) ──
     const unitWaterfallData = useMemo(() => {
@@ -170,9 +189,9 @@ const ShouldCostSimulator = () => {
         data.push({ name: 'Should Cost', label: 'Should-Cost Total', range: [0, totalSC], value: totalSC, fill: '#10b981', isTotal: true });
 
         // Overpay bar (red) — sits ABOVE the green line
+        // clientPays values already represent the landed cost the buyer pays, so no tariff multiplier needed
         const totalActual = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
-        const landedActual = totalActual * (1 + activeSupplier.importDutyPct / 100);
-        const overpay = landedActual - totalSC;
+        const overpay = totalActual - totalSC;
         if (overpay > 0) {
             data.push({ name: 'Overpay', label: 'Overpay Gap', range: [totalSC, totalSC + overpay], value: overpay, fill: '#ef4444', isTotal: true });
         }
@@ -294,7 +313,8 @@ const ShouldCostSimulator = () => {
         const ovhGap = bd ? (bd.overhead.clientPays - bd.overhead.shouldCost) : 0;
         const annualOvhGap = ovhGap * annualUnits;
         const totalClientPays = bd ? (bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays) : activeComponent.currentCost;
-        const totalShouldCost = bd ? (bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost + bd.logistics.shouldCost + bd.supplierMargin.shouldCost) : activeComponent.shouldCost;
+        const tariffOnSC = bd ? bd.rawMaterials.shouldCost * (activeSupplier.importDutyPct / 100) : 0;
+        const totalShouldCost = bd ? (bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost + bd.logistics.shouldCost + bd.supplierMargin.shouldCost + tariffOnSC) : activeComponent.shouldCost;
         const totalAnnualGap = (totalClientPays - totalShouldCost) * annualUnits;
 
         return {
@@ -947,8 +967,10 @@ const ShouldCostSimulator = () => {
                                             <div className="pb-3">
                                                 <div className="text-xs font-semibold text-amber-400 mb-1">Supplier EBITDA Analysis</div>
                                                 <p className="text-sm text-gray-300 leading-relaxed">
-                                                    D&B reports <span className="text-white font-medium">{reasoningData.activeSupplier.name}</span> operating margin at <span className="text-cyan-400 font-bold">11.8%</span>, indicating healthy profitability with room to absorb pricing pressure.{' '}
-                                                    Current quoted pricing is <span className="text-orange-400 font-bold">{((result.currentPrice - result.totalShouldCost) / result.totalShouldCost * 100).toFixed(1)}%</span> above should-cost — well in excess of their margin profile.{' '}
+                                                    D&B reports <span className="text-white font-medium">{reasoningData.activeSupplier.name}</span> operating margin at <span className="text-cyan-400 font-bold">11.8%</span>, yet at our current pricing they earn an implied{' '}
+                                                    <span className="text-orange-400 font-bold">{(() => { const bd = adjustedCostBreakdown; if (!bd) return '—'; const rev = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.supplierMargin.clientPays; const cogs = bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost; return rev > 0 ? ((rev - cogs) / rev * 100).toFixed(0) : '—'; })()}%</span>{' '}
+                                                    margin on our account — roughly 3–4× their reported norm.{' '}
+                                                    Current quoted pricing is <span className="text-orange-400 font-bold">{((result.currentPrice - result.totalShouldCost) / result.totalShouldCost * 100).toFixed(1)}%</span> above should-cost.{' '}
                                                     Total annual overpay = <span className="text-orange-400 font-bold">{formatCurrency(reasoningData.totalAnnualGap)}</span>.
                                                 </p>
                                             </div>

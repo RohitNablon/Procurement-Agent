@@ -4,10 +4,10 @@
         "name": "Toothbrush Handle - Nylon 6",
         "category": "Oral Care",
         "totalSpend": 45200000,
-        "shouldCost": 38400000,
+        "shouldCost": 35500000,
         "currentCost": 45200000,
-        "variance": 6800000,
-        "variancePercent": 17.7,
+        "variance": 9700000,
+        "variancePercent": 27.3,
         "supplier": "PlastiFlex Industries",
         "lastNegotiation": "2025-11-15",
         "contractSignedDate": "2025-11-15",
@@ -28,28 +28,28 @@
         ],
         "agentStatus": "active",
         "bomItemId": "BOM-004",
-        "unitCurrentCost": 1.51,
-        "unitShouldCost": 1.28,
+        "unitCurrentCost": 1.993,
+        "unitShouldCost": 1.564,
         "costBreakdown": {
             "rawMaterials": {
-                "clientPays": 0.78,
-                "shouldCost": 0.62
+                "clientPays": 1.030,
+                "shouldCost": 0.685
             },
             "conversion": {
-                "clientPays": 0.26,
-                "shouldCost": 0.24
+                "clientPays": 0.343,
+                "shouldCost": 0.265
             },
             "overhead": {
-                "clientPays": 0.22,
-                "shouldCost": 0.17
+                "clientPays": 0.290,
+                "shouldCost": 0.188
             },
             "logistics": {
-                "clientPays": 0.08,
-                "shouldCost": 0.07
+                "clientPays": 0.106,
+                "shouldCost": 0.077
             },
             "supplierMargin": {
-                "clientPays": 0.17,
-                "shouldCost": 0.18
+                "clientPays": 0.224,
+                "shouldCost": 0.200
             }
         }
     },
@@ -58,10 +58,10 @@
         "name": "Toothpaste Tube - LDPE",
         "category": "Oral Care",
         "totalSpend": 38500000,
-        "shouldCost": 34100000,
+        "shouldCost": 34000000,
         "currentCost": 38500000,
-        "variance": 4400000,
-        "variancePercent": 12.9,
+        "variance": 4500000,
+        "variancePercent": 13.2,
         "supplier": "FlexiPack Solutions",
         "lastNegotiation": "2025-10-22",
         "contractSignedDate": "2025-10-22",
@@ -111,11 +111,11 @@
         "id": "COMP-003",
         "name": "Electric Toothbrush Motor Assembly",
         "category": "Oral Care",
-        "totalSpend": 52300000,
-        "shouldCost": 48900000,
-        "currentCost": 52300000,
-        "variance": 3400000,
-        "variancePercent": 7.0,
+        "totalSpend": 59300000,
+        "shouldCost": 51370100,
+        "currentCost": 59300000,
+        "variance": 7929900,
+        "variancePercent": 15.4,
         "supplier": "MicroMotion Tech",
         "lastNegotiation": "2025-12-01",
         "contractSignedDate": "2025-12-01",
@@ -128,17 +128,17 @@
         ],
         "primaryCommodity": "Copper",
         "monthlyTrend": [
-            51.2,
-            51.8,
-            52.0,
-            52.3,
-            52.1,
-            52.3
+            58.1,
+            58.7,
+            59.0,
+            59.3,
+            59.1,
+            59.3
         ],
         "agentStatus": "active",
         "bomItemId": "BOM-002",
         "unitCurrentCost": 2.61,
-        "unitShouldCost": 2.45,
+        "unitShouldCost": 2.263,
         "costBreakdown": {
             "rawMaterials": {
                 "clientPays": 1.42,
@@ -166,11 +166,11 @@
         "id": "COMP-004",
         "name": "Toothbrush Bristles - Nylon 612",
         "category": "Oral Care",
-        "totalSpend": 28900000,
-        "shouldCost": 22100000,
-        "currentCost": 28900000,
-        "variance": 6800000,
-        "variancePercent": 30.8,
+        "totalSpend": 37470000,
+        "shouldCost": 34663900,
+        "currentCost": 37470000,
+        "variance": 2806100,
+        "variancePercent": 8.1,
         "supplier": "BristleCraft Ltd",
         "lastNegotiation": "2025-09-14",
         "contractSignedDate": "2025-09-14",
@@ -182,37 +182,37 @@
         ],
         "primaryCommodity": "Nylon 6",
         "monthlyTrend": [
-            27.5,
-            28.0,
-            28.5,
-            28.9,
-            29.2,
-            28.9
+            20.7,
+            21.1,
+            21.5,
+            21.8,
+            22.0,
+            21.8
         ],
         "agentStatus": "escalated",
         "bomItemId": "BOM-001",
-        "unitCurrentCost": 0.96,
-        "unitShouldCost": 0.74,
+        "unitCurrentCost": 1.65,
+        "unitShouldCost": 1.527,
         "costBreakdown": {
             "rawMaterials": {
-                "clientPays": 0.52,
-                "shouldCost": 0.38
+                "clientPays": 0.89,
+                "shouldCost": 0.48
             },
             "conversion": {
-                "clientPays": 0.18,
-                "shouldCost": 0.14
+                "clientPays": 0.31,
+                "shouldCost": 0.17
             },
             "overhead": {
-                "clientPays": 0.13,
-                "shouldCost": 0.10
+                "clientPays": 0.22,
+                "shouldCost": 0.12
             },
             "logistics": {
-                "clientPays": 0.05,
-                "shouldCost": 0.04
+                "clientPays": 0.09,
+                "shouldCost": 0.05
             },
             "supplierMargin": {
-                "clientPays": 0.08,
-                "shouldCost": 0.08
+                "clientPays": 0.14,
+                "shouldCost": 0.09
             }
         }
     },
@@ -220,11 +220,11 @@
         "id": "COMP-005",
         "name": "Mouthwash Bottle - PET",
         "category": "Oral Care",
-        "totalSpend": 19800000,
-        "shouldCost": 17300000,
-        "currentCost": 19800000,
-        "variance": 2500000,
-        "variancePercent": 14.5,
+        "totalSpend": 10000000,
+        "shouldCost": 8800000,
+        "currentCost": 10000000,
+        "variance": 1200000,
+        "variancePercent": 13.6,
         "supplier": "BottleTech Industries",
         "lastNegotiation": "2025-11-28",
         "contractSignedDate": "2025-11-28",
@@ -236,12 +236,12 @@
         ],
         "primaryCommodity": "PET Resin",
         "monthlyTrend": [
-            19.2,
-            19.5,
-            19.7,
-            19.8,
-            19.9,
-            19.8
+            9.7,
+            9.8,
+            9.9,
+            10.0,
+            10.0,
+            10.0
         ],
         "agentStatus": "monitoring",
         "bomItemId": "BOM-M01",
@@ -275,10 +275,10 @@
         "name": "Dental Floss Container - PP",
         "category": "Oral Care",
         "totalSpend": 12400000,
-        "shouldCost": 10900000,
+        "shouldCost": 10800000,
         "currentCost": 12400000,
-        "variance": 1500000,
-        "variancePercent": 13.8,
+        "variance": 1600000,
+        "variancePercent": 14.8,
         "supplier": "ContainerPro",
         "lastNegotiation": "2025-10-05",
         "contractSignedDate": "2025-10-05",
@@ -328,11 +328,11 @@
         "id": "COMP-007",
         "name": "Toothpaste Cap - HDPE",
         "category": "Oral Care",
-        "totalSpend": 8600000,
-        "shouldCost": 7100000,
-        "currentCost": 8600000,
+        "totalSpend": 8500000,
+        "shouldCost": 7000000,
+        "currentCost": 8500000,
         "variance": 1500000,
-        "variancePercent": 21.1,
+        "variancePercent": 21.4,
         "supplier": "CapMasters Inc",
         "lastNegotiation": "2025-08-19",
         "contractSignedDate": "2025-08-19",
@@ -344,12 +344,12 @@
         ],
         "primaryCommodity": "Polypropylene",
         "monthlyTrend": [
+            8.1,
             8.2,
             8.3,
+            8.4,
             8.5,
-            8.6,
-            8.7,
-            8.6
+            8.5
         ],
         "agentStatus": "active",
         "bomItemId": "BOM-T03",
@@ -382,11 +382,11 @@
         "id": "COMP-008",
         "name": "Whitening Strip Packaging - Aluminum",
         "category": "Oral Care",
-        "totalSpend": 16200000,
-        "shouldCost": 14800000,
-        "currentCost": 16200000,
-        "variance": 1400000,
-        "variancePercent": 9.5,
+        "totalSpend": 21600000,
+        "shouldCost": 19600000,
+        "currentCost": 21600000,
+        "variance": 2000000,
+        "variancePercent": 10.2,
         "supplier": "AlumiFlex Packaging",
         "lastNegotiation": "2025-11-10",
         "contractSignedDate": "2025-11-10",
@@ -398,12 +398,12 @@
         ],
         "primaryCommodity": "Aluminum",
         "monthlyTrend": [
-            15.8,
-            16.0,
-            16.1,
-            16.2,
-            16.3,
-            16.2
+            21.0,
+            21.2,
+            21.4,
+            21.6,
+            21.7,
+            21.6
         ],
         "agentStatus": "monitoring",
         "bomItemId": "BOM-T02",
@@ -436,11 +436,11 @@
         "id": "COMP-009",
         "name": "Battery Pack - Li-Ion",
         "category": "Oral Care",
-        "totalSpend": 24700000,
-        "shouldCost": 21900000,
-        "currentCost": 24700000,
-        "variance": 2800000,
-        "variancePercent": 12.8,
+        "totalSpend": 44190000,
+        "shouldCost": 27200000,
+        "currentCost": 44190000,
+        "variance": 16990000,
+        "variancePercent": 62.4,
         "supplier": "PowerCell Solutions",
         "lastNegotiation": "2025-12-05",
         "contractSignedDate": "2025-12-05",
@@ -453,37 +453,37 @@
         ],
         "primaryCommodity": "Lithium",
         "monthlyTrend": [
-            24.0,
-            24.3,
-            24.5,
-            24.7,
-            24.9,
-            24.7
+            27.3,
+            27.7,
+            27.9,
+            28.1,
+            28.3,
+            28.1
         ],
         "agentStatus": "active",
         "bomItemId": "BOM-005",
-        "unitCurrentCost": 1.24,
-        "unitShouldCost": 1.10,
+        "unitCurrentCost": 1.95,
+        "unitShouldCost": 1.20,
         "costBreakdown": {
             "rawMaterials": {
-                "clientPays": 0.60,
-                "shouldCost": 0.52
+                "clientPays": 0.94,
+                "shouldCost": 0.57
             },
             "conversion": {
-                "clientPays": 0.25,
-                "shouldCost": 0.23
+                "clientPays": 0.39,
+                "shouldCost": 0.24
             },
             "overhead": {
-                "clientPays": 0.18,
-                "shouldCost": 0.16
+                "clientPays": 0.28,
+                "shouldCost": 0.18
             },
             "logistics": {
-                "clientPays": 0.09,
-                "shouldCost": 0.08
+                "clientPays": 0.14,
+                "shouldCost": 0.09
             },
             "supplierMargin": {
-                "clientPays": 0.12,
-                "shouldCost": 0.11
+                "clientPays": 0.20,
+                "shouldCost": 0.12
             }
         }
     },
@@ -491,11 +491,11 @@
         "id": "COMP-010",
         "name": "Toothbrush Packaging - Cardboard",
         "category": "Oral Care",
-        "totalSpend": 6300000,
-        "shouldCost": 5500000,
-        "currentCost": 6300000,
-        "variance": 800000,
-        "variancePercent": 14.5,
+        "totalSpend": 3000000,
+        "shouldCost": 2500000,
+        "currentCost": 3000000,
+        "variance": 500000,
+        "variancePercent": 20.0,
         "supplier": "PackPro Graphics",
         "lastNegotiation": "2025-09-28",
         "contractSignedDate": "2025-09-28",
@@ -507,12 +507,12 @@
         ],
         "primaryCommodity": "Polypropylene",
         "monthlyTrend": [
-            6.1,
-            6.2,
-            6.3,
-            6.3,
-            6.3,
-            6.3
+            2.9,
+            3.0,
+            3.0,
+            3.0,
+            3.0,
+            3.0
         ],
         "agentStatus": "monitoring",
         "bomItemId": "BOM-008",

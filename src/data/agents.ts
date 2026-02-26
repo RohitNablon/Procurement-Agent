@@ -68,7 +68,7 @@ export const agents: Agent[] = [
 
 export const agentLogEntries = [
     { agent: 'Commodity Monitor', action: 'Detected Nylon 6 price +3.1%', detail: 'Triggered: Clean-sheet recalc for COMP-001, COMP-004' },
-    { agent: 'Clean-Sheet Generator', action: 'Recalculated 4 toothbrush variants', detail: 'New should-cost range: $38.2M → $38.9M' },
+    { agent: 'Clean-Sheet Generator', action: 'Recalculated 4 toothbrush variants', detail: 'New should-cost range: $35.2M → $35.8M' },
     { agent: 'Risk Assessment', action: 'Updated LDPE supply chain risk', detail: 'Petrochemical feedstock volatility: Medium → High' },
     { agent: 'Orchestrator', action: 'Dispatched negotiation update', detail: 'Fact pack refresh for BristleCraft Ltd' },
     { agent: 'BOM Parser', action: 'Parsed Electric Toothbrush BOM', detail: '47 sub-components extracted from Teamcenter' },

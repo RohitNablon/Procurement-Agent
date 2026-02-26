@@ -175,9 +175,9 @@ const NegotiationWorkspace = () => {
         data.push({ name: 'Should Cost', label: 'Should-Cost Total', range: [0, totalSC], value: totalSC, fill: '#10b981', isTotal: true });
 
         // Overpay bar (red) — sits ABOVE the green line
+        // clientPays values already represent the landed cost the buyer pays, so no tariff multiplier needed
         const totalActual = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
-        const landedActual = totalActual * (1 + activeSupplier.importDutyPct / 100);
-        const overpay = landedActual - totalSC;
+        const overpay = totalActual - totalSC;
         if (overpay > 0) {
             data.push({ name: 'Overpay', label: 'Overpay Gap', range: [totalSC, totalSC + overpay], value: overpay, fill: '#ef4444', isTotal: true });
         }
@@ -362,7 +362,7 @@ const NegotiationWorkspace = () => {
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                                         <span className="w-5 h-5 bg-cyan-500/20 border border-cyan-500/30 rounded flex items-center justify-center text-cyan-400 text-[10px]">↔</span>
-                                        Supplier Comparison — {bomItem.name}
+                                        Supplier Comparison
                                     </h3>
                                     <span className="text-[10px] text-gray-500 bg-white/5 px-2 py-1 rounded border border-white/10">
                                         {bomItem.material} · {bomItem.commodityIndex}
@@ -413,13 +413,15 @@ const NegotiationWorkspace = () => {
                                                         <span className="text-gray-400">Target SC</span>
                                                         <span className="text-green-400 font-bold">${(() => {
                                                             const rmSC = activeComponent.costBreakdown.rawMaterials.shouldCost * (sup.rmLeverageFactor ?? 1);
+                                                            // Target SC includes tariff on raw materials
+                                                            const tariffOnSC = rmSC * (sup.importDutyPct / 100);
                                                             return (
                                                                 rmSC +
                                                                 activeComponent.costBreakdown.conversion.shouldCost +
                                                                 activeComponent.costBreakdown.overhead.shouldCost * (sup.overheadBenchmarkPct / 15) +
                                                                 activeComponent.costBreakdown.logistics.shouldCost +
                                                                 activeComponent.costBreakdown.supplierMargin.shouldCost +
-                                                                rmSC * (sup.importDutyPct / 100)
+                                                                tariffOnSC
                                                             ).toFixed(3);
                                                         })()}</span>
                                                     </div>
@@ -457,12 +459,12 @@ const NegotiationWorkspace = () => {
                         ══════════════════════════════════════════════ */}
                         {adjustedCostBreakdown && unitWaterfallData.length > 0 && activeSupplier && (() => {
                             const bd = adjustedCostBreakdown;
+                            // clientPays values already represent the landed cost the buyer pays, so no tariff multiplier needed
                             const totalActual = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
-                            const landedActual = totalActual * (1 + activeSupplier.importDutyPct / 100);
                             // Should-cost total = sum of all component bars (shouldCost values + tariff on shouldCost)
                             const scEntry = unitWaterfallData.find(d => d.name === 'Should Cost');
                             const totalSC = scEntry ? scEntry.value : 0;
-                            const gap = landedActual - totalSC;
+                            const gap = totalActual - totalSC;
                             const fmtUnit = (v: number) => `$${v.toFixed(3)}`;
                             return (
                                 <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-5">
@@ -535,7 +537,7 @@ const NegotiationWorkspace = () => {
                                     </ResponsiveContainer>
 
                                     <div className="mt-2 flex items-center gap-6 text-[10px] text-gray-500 px-1">
-                                        <span>Landed unit price: <span className="text-white font-semibold">{fmtUnit(landedActual)}</span></span>
+                                        <span>Landed unit price: <span className="text-white font-semibold">{fmtUnit(totalActual)}</span></span>
                                         <span>Should-cost unit: <span className="text-emerald-400 font-semibold">{fmtUnit(totalSC)}</span></span>
                                         <span>Overpay gap: <span className="text-red-400 font-semibold">{fmtUnit(gap)}</span></span>
                                     </div>
@@ -551,9 +553,10 @@ const NegotiationWorkspace = () => {
                             const uc = activeComponent.unitCurrentCost ?? 1;
                             const annualUnits = uc > 0 ? activeComponent.totalSpend / uc : 0;
 
-                            // Supplier-adjusted totals
+                            // Supplier-adjusted totals (include tariff in should-cost so overpay = current quote − full landed SC)
                             const adjUnitActual = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
-                            const adjUnitSC = bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost + bd.logistics.shouldCost + bd.supplierMargin.shouldCost;
+                            const tariffOnSC = bd.rawMaterials.shouldCost * (activeSupplier.importDutyPct / 100);
+                            const adjUnitSC = bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost + bd.logistics.shouldCost + bd.supplierMargin.shouldCost + tariffOnSC;
                             const adjVariancePct = adjUnitSC > 0 ? ((adjUnitActual - adjUnitSC) / adjUnitSC * 100) : 0;
                             const adjTotalAnnualGap = (adjUnitActual - adjUnitSC) * annualUnits;
 
@@ -643,8 +646,10 @@ const NegotiationWorkspace = () => {
                                             <div className="pb-3">
                                                 <div className="text-xs font-semibold text-amber-400 mb-1">Supplier EBITDA Analysis</div>
                                                 <p className="text-sm text-gray-300 leading-relaxed">
-                                                    D&B reports <span className="text-white font-medium">{activeSupplier.name}</span> operating margin at <span className="text-cyan-400 font-bold">11.8%</span>, indicating healthy profitability with room to absorb pricing pressure.{' '}
-                                                    Current quoted pricing is <span className="text-orange-400 font-bold">{adjVariancePct.toFixed(1)}%</span> above should-cost — well in excess of their margin profile.{' '}
+                                                    D&B reports <span className="text-white font-medium">{activeSupplier.name}</span> operating margin at <span className="text-cyan-400 font-bold">11.8%</span>, yet at our current pricing they earn an implied{' '}
+                                                    <span className="text-orange-400 font-bold">{(() => { const rev = adjUnitActual - bd.logistics.clientPays; const cogs = bd.rawMaterials.shouldCost + bd.conversion.shouldCost + bd.overhead.shouldCost; return rev > 0 ? ((rev - cogs) / rev * 100).toFixed(0) : '—'; })()}%</span>{' '}
+                                                    margin on our account — roughly 3–4× their reported norm.{' '}
+                                                    Current quoted pricing is <span className="text-orange-400 font-bold">{adjVariancePct.toFixed(1)}%</span> above should-cost.{' '}
                                                     Total annual overpay = <span className="text-orange-400 font-bold">{formatCurrency(adjTotalAnnualGap)}</span>.
                                                 </p>
                                             </div>
@@ -701,8 +706,8 @@ const NegotiationWorkspace = () => {
                                                         return (
                                                             <p className="text-sm text-gray-200 leading-relaxed">
                                                                 <span className="text-white font-semibold">Open targeted re-negotiation</span> citing commodity index decline + overhead benchmark.{' '}
-                                                                Target: <span className="text-green-400 font-bold">${targetUnit.toFixed(3)}/unit</span>.{' '}
-                                                                Walk-away: <span className="text-yellow-400 font-bold">${walkAway.toFixed(3)}/unit</span>.
+                                                                {/* Target: <span className="text-green-400 font-bold">${targetUnit.toFixed(3)}/unit</span>.{' '} */}
+                                                                {/* Walk-away: <span className="text-yellow-400 font-bold">${walkAway.toFixed(3)}/unit</span>. */}
                                                             </p>
                                                         );
                                                     })()}
@@ -970,34 +975,63 @@ const NegotiationWorkspace = () => {
                                     <div className="border-t border-white/10 pt-4">
                                         <h4 className="text-xs font-bold text-cyan-400 uppercase mb-3">Market Intelligence & Alternates</h4>
                                         <div className="space-y-3">
-                                            <div className="flex justify-between text-sm mb-2">
-                                                <span className="text-gray-400">Market Price Range:</span>
-                                                <span className="text-white font-medium">{formatCurrency(activeComponent.shouldCost * 0.98)} - {formatCurrency(activeComponent.shouldCost * 1.05)}</span>
-                                            </div>
+                                            {(() => {
+                                                // Get all alternative suppliers (exclude the currently active one)
+                                                const alternativeSuppliers = bomItem?.suppliers.filter(s => s.id !== activeSupplier?.id) || [];
+                                                
+                                                // Calculate price range from all suppliers
+                                                const allPrices = bomItem?.suppliers.map(sup => {
+                                                    const bd = activeComponent.costBreakdown;
+                                                    const defaultSup = bomItem.suppliers.find(s => s.id === bomItem.defaultSupplierId) || bomItem.suppliers[0];
+                                                    const scaleFactor = defaultSup.pricePerUnit > 0 ? sup.pricePerUnit / defaultSup.pricePerUnit : 1;
+                                                    return bd.rawMaterials.clientPays * scaleFactor + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
+                                                }) || [];
+                                                
+                                                const minPrice = Math.min(...allPrices);
+                                                const maxPrice = Math.max(...allPrices);
+                                                
+                                                return (
+                                                    <>
+                                                        <div className="flex justify-between text-sm mb-2">
+                                                            <span className="text-gray-400">Market Price Range:</span>
+                                                            <span className="text-white font-medium">{formatCurrency(minPrice * activeComponent.totalSpend / activeComponent.unitCurrentCost)} - {formatCurrency(maxPrice * activeComponent.totalSpend / activeComponent.unitCurrentCost)}</span>
+                                                        </div>
 
-                                            <div className="bg-white/5 rounded-lg p-3 space-y-3">
-                                                {[
-                                                    { name: "TechMould Industries", location: "Vietnam", quote: activeComponent.shouldCost * 1.03, score: "96% (A)", trend: "down" },
-                                                    { name: "PolyForm Global", location: "Mexico", quote: activeComponent.shouldCost * 1.08, score: "94% (A-)", trend: "stable" },
-                                                    { name: "Apex Precision", location: "Thailand", quote: activeComponent.shouldCost * 1.01, score: "88% (B+)", trend: "up" }
-                                                ].map((supp, i) => (
-                                                    <div key={i} className="flex items-center justify-between text-xs border-b border-white/5 last:border-0 pb-2 last:pb-0">
-                                                        <div>
-                                                            <div className="text-white font-medium">{supp.name}</div>
-                                                            <div className="text-gray-500">{supp.location} • Qual: {supp.score}</div>
+                                                        <div className="bg-white/5 rounded-lg p-3 space-y-3">
+                                                            {alternativeSuppliers.map((sup, i) => {
+                                                                const bd = activeComponent.costBreakdown;
+                                                                const defaultSup = bomItem.suppliers.find(s => s.id === bomItem.defaultSupplierId) || bomItem.suppliers[0];
+                                                                const scaleFactor = defaultSup.pricePerUnit > 0 ? sup.pricePerUnit / defaultSup.pricePerUnit : 1;
+                                                                const unitQuote = bd.rawMaterials.clientPays * scaleFactor + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
+                                                                const annualQuote = unitQuote * (activeComponent.totalSpend / activeComponent.unitCurrentCost);
+                                                                
+                                                                // Calculate quality score based on scale score and financial health
+                                                                const healthScore = sup.financialHealth === 'Stable' ? 100 : sup.financialHealth === 'Watch' ? 94 : 88;
+                                                                const qualScore = Math.round((sup.scaleScore * 0.7 + (healthScore / 100) * 0.3) * 100);
+                                                                const qualGrade = qualScore >= 95 ? 'A' : qualScore >= 90 ? 'A-' : qualScore >= 85 ? 'B+' : 'B';
+                                                                
+                                                                return (
+                                                                    <div key={sup.id} className="flex items-center justify-between text-xs border-b border-white/5 last:border-0 pb-2 last:pb-0">
+                                                                        <div>
+                                                                            <div className="text-white font-medium">{sup.name}</div>
+                                                                            <div className="text-gray-500">{sup.region} • Qual: {qualScore}% ({qualGrade})</div>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="text-cyan-400 font-medium">{formatCurrency(annualQuote)}</div>
+                                                                            <div className="text-gray-500">
+                                                                                {((annualQuote - activeComponent.shouldCost) / activeComponent.shouldCost * 100).toFixed(1)}% vs Should-Cost
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
-                                                        <div className="text-right">
-                                                            <div className="text-cyan-400 font-medium">{formatCurrency(supp.quote)}</div>
-                                                            <div className="text-gray-500">
-                                                                {((supp.quote - activeComponent.shouldCost) / activeComponent.shouldCost * 100).toFixed(1)}% vs Should-Cost
-                                                            </div>
+                                                        <div className="text-xs text-gray-400 italic mt-2">
+                                                            *Quotes valid for 30 days. {alternativeSuppliers[0]?.importDutyPct === 0 ? `${alternativeSuppliers[0]?.name} has no import duty advantage.` : 'Price includes applicable import duties.'}
                                                         </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div className="text-xs text-gray-400 italic mt-2">
-                                                *Quotes valid for 30 days. TechMould offer includes logistical rebate.
-                                            </div>
+                                                    </>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
@@ -1037,7 +1071,7 @@ const NegotiationWorkspace = () => {
 
                                 {/* Objection Playbook */}
                                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-                                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">⚔️ Objection Playbook</h3>
+                                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-4">Objection Playbook</h3>
                                     <div className="space-y-2">
                                         {objections.map((obj, idx) => (
                                             <div key={idx} className="border border-white/10 rounded-lg overflow-hidden">

@@ -7,6 +7,7 @@ import { ActivityFeed } from '../components/ActivityFeed';
 import { DollarSign, AlertCircle, Target, X, ChevronLeft, ChevronRight, Clock, ArrowRight } from 'lucide-react';
 import { navItems } from '../data/navItems';
 import componentsData from '../data/components.json';
+import commodityPrices from '../data/commodityPrices.json';
 import agentActivity from '../data/agent-activity.json';
 import { useProduct } from '../context/ProductContext';
 import { products } from '../data/products';
@@ -21,6 +22,7 @@ interface Component {
     name: string;
     totalSpend: number;
     shouldCost: number;
+    currentCost: number;
     variance: number;
     variancePercent: number;
     supplier: string;
@@ -29,6 +31,59 @@ interface Component {
     bomItemId?: string;
     primaryCommodity?: string;
     contractSignedDate?: string;
+    unitCurrentCost?: number;
+    unitShouldCost?: number;
+    costBreakdown?: {
+        rawMaterials: { clientPays: number; shouldCost: number };
+        conversion: { clientPays: number; shouldCost: number };
+        overhead: { clientPays: number; shouldCost: number };
+        logistics: { clientPays: number; shouldCost: number };
+        supplierMargin: { clientPays: number; shouldCost: number };
+    };
+}
+
+// ── Supplier-adjusted totals per component (mirrors NegotiationWorkspace adjustedCostBreakdown) ──
+function getAdjustedTotals(c: Component, product?: Product) {
+    const bomItem = product?.bom.find(b => b.id === c.bomItemId);
+    const defSupplier = bomItem?.suppliers.find(s => s.id === bomItem.defaultSupplierId)
+        ?? bomItem?.suppliers[0];
+    const bd = c.costBreakdown;
+
+    if (!bd || !defSupplier) {
+        return {
+            adjustedShouldCost: c.shouldCost,
+            adjustedVariance: c.totalSpend - c.shouldCost,
+            adjustedVariancePct: c.variancePercent,
+            unitActual: c.unitCurrentCost ?? 0,
+            unitSC: c.unitShouldCost ?? 0,
+            annualUnits: c.unitCurrentCost ? c.totalSpend / c.unitCurrentCost : 0,
+        };
+    }
+
+    const rmLeverage = defSupplier.rmLeverageFactor ?? 1.0;
+    const ohTargetScale = defSupplier.overheadBenchmarkPct / 15;
+
+    // Supplier-adjusted should-cost (unit level) — matching NegotiationWorkspace
+    const adjRmSC = bd.rawMaterials.shouldCost * rmLeverage;
+    const adjOhSC = bd.overhead.shouldCost * ohTargetScale;
+    const tariffOnSC = adjRmSC * (defSupplier.importDutyPct / 100);
+
+    const unitSC = adjRmSC + bd.conversion.shouldCost + adjOhSC
+        + bd.logistics.shouldCost + bd.supplierMargin.shouldCost + tariffOnSC;
+    const unitActual = bd.rawMaterials.clientPays + bd.conversion.clientPays
+        + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
+
+    const uc = c.unitCurrentCost ?? 1;
+    const annualUnits = uc > 0 ? c.totalSpend / uc : 0;
+
+    return {
+        adjustedShouldCost: unitSC * annualUnits,
+        adjustedVariance: (unitActual - unitSC) * annualUnits,
+        adjustedVariancePct: unitSC > 0 ? ((unitActual - unitSC) / unitSC * 100) : 0,
+        unitActual,
+        unitSC,
+        annualUnits,
+    };
 }
 
 // ── Insight shape ──────────────────────────────────────────────────────────
@@ -52,17 +107,22 @@ interface Insight {
 // Build a rich insight from a component — sources and tariff step are derived
 // from real supplier data for that component's BOM item
 function buildInsight(c: Component, now: Date, offsetMs = 0, product?: Product): Insight {
-    const isHigh = c.variancePercent > 20;
-    const isElev = c.variancePercent > 10;
-    const severity = isHigh ? 'red' : isElev ? 'yellow' : 'cyan';
-    const savingsAbs = ((c.totalSpend - c.shouldCost) / 1_000_000).toFixed(2);
-    const savingsPct = Math.min(c.variancePercent, 30).toFixed(1);
     const ts = new Date(now.getTime() - offsetMs);
 
     // Look up the BOM item for this component to get real supplier data
     const bomItem = product?.bom.find(b => b.id === c.bomItemId);
     const defSupplier = bomItem?.suppliers.find(s => s.id === bomItem.defaultSupplierId)
         ?? bomItem?.suppliers[0];
+
+    // ── Supplier-adjusted calculations (matching NegotiationWorkspace) ──
+    const adj = getAdjustedTotals(c, product);
+    const adjVariancePct = adj.adjustedVariancePct;
+
+    const isHigh = adjVariancePct > 20;
+    const isElev = adjVariancePct > 10;
+    const severity = isHigh ? 'red' : isElev ? 'yellow' : 'cyan';
+    const savingsAbs = (adj.adjustedVariance / 1_000_000).toFixed(2);
+    const savingsPct = Math.min(adjVariancePct, 30).toFixed(1);
 
     // Tariff-aware values
     const tariffPct = defSupplier?.importDutyPct ?? 0;
@@ -106,10 +166,29 @@ function buildInsight(c: Component, now: Date, offsetMs = 0, product?: Product):
     ];
     if (hasTariff) sources.splice(2, 0, 'USITC HTS Tariff Schedule');
 
-    const rmDrop = (Math.random() * 6 + 4).toFixed(1);
-    const ovhExcess = (defSupplier ? (defSupplier.overheadBenchmarkPct - 14).toFixed(1) : (Math.random() * 5 + 3).toFixed(1));
-    const marginEx = (Math.random() * 4 + 2).toFixed(1);
-    const landedUplift = (tariffPct * 0.6).toFixed(1); // rough landed cost impact
+    // ── Commodity price change from actual market data (matching NegotiationWorkspace) ──
+    const commodityData = (commodityPrices as { commodity: string; history: { date: string; price: number }[] }[]).find(cp => cp.commodity === commodity);
+    const commPricePct = commodityData?.history?.length
+        ? ((commodityData.history[commodityData.history.length - 1].price - commodityData.history[0].price) / commodityData.history[0].price * 100)
+        : 0;
+    const rmDrop = Math.abs(commPricePct).toFixed(1);
+
+    // ── Overhead excess from supplier benchmark (matching NegotiationWorkspace) ──
+    const ohTargetScale = defSupplier ? defSupplier.overheadBenchmarkPct / 15 : 1;
+    const ovhExcess = defSupplier ? (defSupplier.overheadBenchmarkPct - 13).toFixed(1) : '3.0';
+
+    // ── Implied margin from cost breakdown (matching NegotiationWorkspace EBITDA analysis) ──
+    const bd = c.costBreakdown;
+    let marginEx = '0.0';
+    if (bd && defSupplier) {
+        const adjRmSC = bd.rawMaterials.shouldCost * (defSupplier.rmLeverageFactor ?? 1);
+        const unitActual = bd.rawMaterials.clientPays + bd.conversion.clientPays + bd.overhead.clientPays + bd.logistics.clientPays + bd.supplierMargin.clientPays;
+        const rev = unitActual - bd.logistics.clientPays;
+        const cogs = adjRmSC + bd.conversion.shouldCost + bd.overhead.shouldCost * ohTargetScale;
+        const impliedMarginPct = rev > 0 ? ((rev - cogs) / rev * 100) : 0;
+        marginEx = Math.max(0, impliedMarginPct - 11.8).toFixed(1);
+    }
+    const landedUplift = (tariffPct * 0.6).toFixed(1);
 
     const traceSteps: Insight['trace'] = [
         {
@@ -128,7 +207,7 @@ function buildInsight(c: Component, now: Date, offsetMs = 0, product?: Product):
             step: 3,
             label: 'Supplier Margin Analysis',
             color: 'amber',
-            detail: `Supplier margin is ${marginEx}% above the should-cost model. Combined with RM and overhead gaps, total recoverable gap = $${savingsAbs}M annually at current run rate.`,
+            detail: `At current pricing, implied supplier margin on our account is ~${marginEx}pp above their reported 11.8% EBITDA norm. Current quoted pricing is ${savingsPct}% above should-cost. Combined with RM and overhead gaps, total recoverable gap = $${savingsAbs}M annually at current run rate.`,
         },
     ];
 
@@ -163,7 +242,7 @@ function buildInsight(c: Component, now: Date, offsetMs = 0, product?: Product):
         step: 6,
         label: 'Autonomous Recommendation Generated',
         color: 'green',
-        detail: `Agent recommends a targeted re-negotiation citing: (a) ${commodity} index decline (${commoditySrc}), (b) overhead vs. Hackett benchmark${hasTariff ? `, (c) tariff-adjusted landed cost at ${tariffPct}% import duty` : ', (c) zero tariff exposure confirms quoted price should fully reflect market rates'}, (d) supplier financial health: ${health}. Target price: $${((c.shouldCost / 1_000_000) * 1.02).toFixed(2)}M/yr. Maximum annual recovery: $${savingsAbs}M.`,
+        detail: `Agent recommends a targeted re-negotiation citing: (a) ${commodity} index ${commPricePct < 0 ? 'decline' : 'movement'} of ${rmDrop}% (${commoditySrc}), (b) overhead ${Number(ovhExcess) > 0 ? `benchmark excess of ${ovhExcess}pp` : 'within benchmark'}${hasTariff ? `, (c) tariff-adjusted landed cost at ${tariffPct}% import duty` : ', (c) zero tariff exposure confirms quoted price should fully reflect market rates'}, (d) supplier financial health: ${health}. Target price: $${((adj.adjustedShouldCost / 1_000_000) * 1.02).toFixed(2)}M/yr. Walk-away: $${((adj.adjustedShouldCost / 1_000_000) * 1.05).toFixed(2)}M/yr. Maximum annual recovery: $${savingsAbs}M.`,
     });
 
     return {
@@ -324,36 +403,41 @@ type ComponentWithBreakdown = {
 
 function buildWaterfallData(comps: ComponentWithBreakdown[]): WaterfallBar[] {
     // Aggregate each cost bucket from components.json costBreakdown
-    const sum = (key: keyof NonNullable<ComponentWithBreakdown['costBreakdown']>, field: 'clientPays' | 'shouldCost') =>
-        comps.reduce((acc, c) => acc + (c.costBreakdown?.[key]?.[field] ?? 0), 0);
+    // Per-component annual units for proper unit-to-spend scaling (matches NegotiationWorkspace)
+    const perCompUnits = (c: ComponentWithBreakdown) => {
+        const uc = (c as any).unitCurrentCost ?? 0;
+        return uc > 0 ? c.totalSpend / uc : 0;
+    };
 
-    // Scale up from per-unit to total spend ($M)
-    const scaleFactor = comps.reduce((s, c) => s + c.totalSpend, 0) /
-        Math.max(comps.reduce((s, c) => s + (c.costBreakdown?.rawMaterials?.clientPays ?? 0)
-            + (c.costBreakdown?.conversion?.clientPays ?? 0)
-            + (c.costBreakdown?.overhead?.clientPays ?? 0)
-            + (c.costBreakdown?.logistics?.clientPays ?? 0)
-            + (c.costBreakdown?.supplierMargin?.clientPays ?? 0), 0), 1);
-
-    const buckets = [
-        { key: 'rawMaterials' as const, label: 'Raw Materials', shortLabel: 'Raw Mats', color: '#3b82f6' },
-        { key: 'conversion' as const, label: 'Manufacturing', shortLabel: 'Mfg', color: '#6366f1' },
-        { key: 'overhead' as const, label: 'Overhead', shortLabel: 'Overhead', color: '#8b5cf6' },
-        { key: 'logistics' as const, label: 'Logistics', shortLabel: 'Logistics', color: '#a78bfa' },
-        { key: 'supplierMargin' as const, label: 'Supplier Margin', shortLabel: 'Margin', color: '#c4b5fd' },
+    const bucketKeys: (keyof NonNullable<ComponentWithBreakdown['costBreakdown']>)[] =
+        ['rawMaterials', 'conversion', 'overhead', 'logistics', 'supplierMargin'];
+    const bucketMeta = [
+        { label: 'Raw Materials', shortLabel: 'Raw Mats', color: '#3b82f6' },
+        { label: 'Manufacturing', shortLabel: 'Mfg', color: '#6366f1' },
+        { label: 'Overhead', shortLabel: 'Overhead', color: '#8b5cf6' },
+        { label: 'Logistics', shortLabel: 'Logistics', color: '#a78bfa' },
+        { label: 'Supplier Margin', shortLabel: 'Margin', color: '#c4b5fd' },
     ];
 
-    const totalShouldCost = comps.reduce((s, c) => s + c.shouldCost, 0) / 1_000_000;
+    // Sum each cost bucket scaled by per-component annual units ($M)
+    const bucketTotals = bucketKeys.map(key =>
+        comps.reduce((acc, c) => acc + (c.costBreakdown?.[key]?.clientPays ?? 0) * perCompUnits(c), 0) / 1_000_000
+    );
+
+    // Supplier-adjusted should-cost total ($M)
+    const totalShouldCost = comps.reduce((s, c) => {
+        const adj = getAdjustedTotals(c as unknown as Component, undefined);
+        return s + adj.adjustedShouldCost;
+    }, 0) / 1_000_000;
     const totalSpend = comps.reduce((s, c) => s + c.totalSpend, 0) / 1_000_000;
 
     const bars: WaterfallBar[] = [];
     let running = 0;
 
-    for (const b of buckets) {
-        const rawVal = sum(b.key, 'clientPays') * scaleFactor / 1_000_000;
-        bars.push({ label: b.label, shortLabel: b.shortLabel, base: running, value: rawVal, color: b.color, isTotal: false });
-        running += rawVal;
-    }
+    bucketMeta.forEach((meta, i) => {
+        bars.push({ label: meta.label, shortLabel: meta.shortLabel, base: running, value: bucketTotals[i], color: meta.color, isTotal: false });
+        running += bucketTotals[i];
+    });
 
     // Should-Cost total bar (green)
     bars.push({ label: 'Should-Cost Total', shortLabel: 'Should Cost', base: 0, value: totalShouldCost, color: '#10b981', isTotal: true });
@@ -475,14 +559,19 @@ const CommandCenter: React.FC = () => {
         return a.name.localeCompare(b.name);
     }), [filteredComponents, sortField]);
 
-    // KPIs
+    // KPIs — supplier-adjusted totals (matching NegotiationWorkspace tariff-inclusive should-cost)
+    const adjustedComponentTotals = useMemo(() =>
+        filteredComponents.map(c => ({ comp: c, adj: getAdjustedTotals(c, product) })),
+        [filteredComponents, product]);
+
     const totalSpend = filteredComponents.reduce((s, c) => s + c.totalSpend, 0);
-    const totalShouldCost = filteredComponents.reduce((s, c) => s + c.shouldCost, 0);
-    const totalVariance = totalSpend - totalShouldCost;
+    const totalShouldCost = adjustedComponentTotals.reduce((s, t) => s + t.adj.adjustedShouldCost, 0);
+    const totalVariance = adjustedComponentTotals.reduce((s, t) => s + t.adj.adjustedVariance, 0);
     const variancePercent = totalShouldCost > 0 ? ((totalVariance / totalShouldCost) * 100).toFixed(1) : '0.0';
     const activeComponents = filteredComponents.filter(c => c.agentStatus === 'active').length;
     const highRiskComponents = filteredComponents.filter(c => c.riskLevel === 'High').length;
-    const fmt = (v: number) => `$${(v / 1_000_000).toFixed(1)}M`;
+    // Floor to 1 decimal so KPI total matches the sum of individually-rounded table rows
+    const fmt = (v: number) => `$${(Math.floor(v / 100_000) / 10).toFixed(1)}M`;
 
     // ── Seed all component insights on mount / product change ────────────
     useEffect(() => {
@@ -689,7 +778,10 @@ const CommandCenter: React.FC = () => {
                                     </thead>
                                     <tbody>
                                         {sorted.length > 0 ? (
-                                            sorted.map(comp => (
+                                            sorted.map(comp => {
+                                                const compAdj = getAdjustedTotals(comp, product);
+                                                const adjVarPct = compAdj.adjustedVariancePct;
+                                                return (
                                                 <tr
                                                     key={comp.id}
                                                     onClick={() => navigate('/negotiation', { state: { componentId: comp.id } })}
@@ -700,15 +792,15 @@ const CommandCenter: React.FC = () => {
                                                         <div className="text-xs text-gray-500">{comp.supplier}</div>
                                                     </td>
                                                     <td className="text-right py-3 px-4 text-white tabular-nums">{fmt(comp.totalSpend)}</td>
-                                                    <td className="text-right py-3 px-4 text-gray-400 tabular-nums">{fmt(comp.shouldCost)}</td>
+                                                    <td className="text-right py-3 px-4 text-gray-400 tabular-nums">{fmt(compAdj.adjustedShouldCost)}</td>
                                                     <td className="text-right py-3 px-4">
-                                                        <span className={comp.variancePercent > 15 ? 'text-red-400' : comp.variancePercent > 10 ? 'text-yellow-400' : 'text-green-400'}>
-                                                            +{comp.variancePercent.toFixed(1)}%
+                                                        <span className={adjVarPct > 15 ? 'text-red-400' : adjVarPct > 10 ? 'text-yellow-400' : 'text-green-400'}>
+                                                            +{adjVarPct.toFixed(1)}%
                                                         </span>
                                                     </td>
                                                     <td className="text-right py-3 px-4">
-                                                        <span className={comp.variancePercent > 15 ? 'text-red-400' : comp.variancePercent > 10 ? 'text-yellow-400' : 'text-green-400'}>
-                                                            {fmt(comp.totalSpend - comp.shouldCost)}
+                                                        <span className={adjVarPct > 15 ? 'text-red-400' : adjVarPct > 10 ? 'text-yellow-400' : 'text-green-400'}>
+                                                            {fmt(compAdj.adjustedVariance)}
                                                         </span>
                                                     </td>
                                                     <td className="text-center py-3 px-4">
@@ -720,7 +812,8 @@ const CommandCenter: React.FC = () => {
                                                         </span>
                                                     </td>
                                                 </tr>
-                                            ))
+                                            );
+                                            })
                                         ) : (
                                             <tr>
                                                 <td colSpan={6} className="py-8 text-center text-gray-500 text-sm">

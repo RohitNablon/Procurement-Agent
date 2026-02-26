@@ -7,7 +7,7 @@
         "component": "Toothbrush Handle - Nylon 6",
         "componentId": "COMP-001",
         "status": "success",
-        "details": "Should-cost updated from $38.1M to $38.4M (+0.8%)",
+        "details": "Should-cost updated to $35.5M after commodity re-benchmark and tariff adjustment",
         "priority": "high"
     },
     {
@@ -40,7 +40,7 @@
         "component": "Toothbrush Bristles - Nylon 612",
         "componentId": "COMP-004",
         "status": "success",
-        "details": "New labor rates and commodity prices incorporated. Variance now 30.8%.",
+        "details": "New labor rates and commodity prices incorporated. Variance now 29.8%.",
         "priority": "critical"
     },
     {
